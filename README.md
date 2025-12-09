@@ -15,3 +15,6 @@ Flutter mobile app for the CSE489 assignment that manages Bangladesh landmarks v
 - `flutter run` (choose Android/iOS/web as needed)
 
 For web builds, file uploads are skipped; test full image flows on mobile.
+
+## Workflow
+- Changes land on feature branches (e.g., `feature/app-updates-clean`) with a PR into `main`.
