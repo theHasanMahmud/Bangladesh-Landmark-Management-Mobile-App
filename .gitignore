@@ -1,0 +1,32 @@
+# Flutter/Dart
+.dart_tool/
+build/
+flutter/
+pubspec.lock
+.packages
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# Xcode
+Pods/
+*.xcworkspace
+*.xcuserdatad
+
+# Android
+.gradle/
+/.gradle
+/local.properties
+
+# Others
+*.apk
+*.aab
+*.so
+generated/
