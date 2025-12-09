@@ -19,6 +19,10 @@ dependencies:
   sqflite: ^2.2.8+1
   path: ^1.8.3
   flutter_slidable: ^2.0.0
+  cached_network_image: ^3.2.3
+  flutter_map_marker_cluster: ^1.0.0
+  geolocator: ^10.1.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
