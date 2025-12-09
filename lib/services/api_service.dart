@@ -4,15 +4,19 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import '../models/landmark.dart';
+import 'auth_service.dart';
 
 class ApiService {
   static const String baseUrl = 'https://labs.anontech.info/cse489/t3/api.php';
 
   final http.Client _client;
-  ApiService([http.Client? client]) : _client = client ?? http.Client();
+  final AuthService _auth;
+  ApiService([http.Client? client, AuthService? auth])
+      : _client = client ?? http.Client(),
+        _auth = auth ?? AuthService();
 
   Future<List<Landmark>> fetchAll() async {
-    final resp = await _client.get(Uri.parse(baseUrl));
+    final resp = await _client.get(Uri.parse(baseUrl), headers: _auth.authHeaders);
     if (resp.statusCode == 200) {
       final list = json.decode(resp.body) as List<dynamic>;
       return list.map((e) => Landmark.fromJson(e as Map<String, dynamic>)).toList();
@@ -26,6 +30,7 @@ class ApiService {
     request.fields['title'] = landmark.title;
     request.fields['lat'] = landmark.lat.toString();
     request.fields['lon'] = landmark.lon.toString();
+    request.headers.addAll(_auth.authHeaders);
     if (imageFile != null && await imageFile.exists()) {
       final stream = http.ByteStream(imageFile.openRead());
       final length = await imageFile.length();
@@ -53,6 +58,7 @@ class ApiService {
       request.fields['title'] = landmark.title;
       request.fields['lat'] = landmark.lat.toString();
       request.fields['lon'] = landmark.lon.toString();
+      request.headers.addAll(_auth.authHeaders);
       final stream = http.ByteStream(imageFile.openRead());
       final length = await imageFile.length();
       request.files.add(http.MultipartFile('image', stream, length, filename: p.basename(imageFile.path)));
@@ -61,7 +67,8 @@ class ApiService {
       return resp.statusCode == 200;
     } else {
       // send as x-www-form-urlencoded via PUT
-      final resp = await _client.put(uri, headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: {
+      final headers = {'Content-Type': 'application/x-www-form-urlencoded', ..._auth.authHeaders};
+      final resp = await _client.put(uri, headers: headers, body: {
         'id': landmark.id.toString(),
         'title': landmark.title,
         'lat': landmark.lat.toString(),
@@ -73,7 +80,7 @@ class ApiService {
 
   Future<bool> delete(int id) async {
     final uri = Uri.parse(baseUrl);
-    final resp = await _client.delete(uri.replace(queryParameters: {'id': id.toString()}));
+    final resp = await _client.delete(uri.replace(queryParameters: {'id': id.toString()}), headers: _auth.authHeaders);
     return resp.statusCode == 200;
   }
 }
