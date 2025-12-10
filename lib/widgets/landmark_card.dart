@@ -7,12 +7,14 @@ class LandmarkCard extends StatelessWidget {
   final Landmark landmark;
   const LandmarkCard({super.key, required this.landmark});
 
+  bool get _hasValidImage => landmark.imageUrl != null && landmark.imageUrl!.startsWith('http');
+
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
-        leading: landmark.imageUrl != null
+        leading: _hasValidImage
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: CachedNetworkImage(

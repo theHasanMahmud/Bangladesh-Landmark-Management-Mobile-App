@@ -16,6 +16,14 @@ class AuthService {
 
   Map<String, String> get authHeaders => _token != null ? {'Authorization': 'Bearer $_token'} : {};
 
+  /// Call this after Clerk (or any IdP) returns a session/JWT token.
+  Future<void> setExternalToken(String token) async {
+    _token = token;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, _token!);
+    isLoggedIn.value = true;
+  }
+
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString(_tokenKey);
@@ -24,11 +32,8 @@ class AuthService {
 
   Future<bool> login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) return false;
-    // Simulate token generation; in a real app you'd exchange credentials with an auth endpoint.
-    _token = '${username.hashCode}-${password.hashCode}';
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, _token!);
-    isLoggedIn.value = true;
+    // Legacy mock login; prefer setExternalToken() with Clerk session tokens.
+    await setExternalToken('${username.hashCode}-${password.hashCode}');
     return true;
   }
 

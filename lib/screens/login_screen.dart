@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../config/clerk_config.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,33 +12,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _userCtl = TextEditingController();
-  final _passCtl = TextEditingController();
+  final _tokenCtl = TextEditingController();
   bool _loading = false;
   String? _error;
 
   @override
   void dispose() {
-    _userCtl.dispose();
-    _passCtl.dispose();
+    _tokenCtl.dispose();
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    final ok = await AuthService().login(_userCtl.text.trim(), _passCtl.text);
-    if (!mounted) return;
-    if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Logged in')));
+  Future<void> _openClerkHosted() async {
+    final uri = Uri.parse('https://accounts.clerk.com/v2/sign-in?redirect_url=https://dashboard.clerk.com&publishable_key=${ClerkConfig.publishableKey}');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      setState(() => _error = 'Invalid credentials');
+      if (!mounted) return;
+      setState(() => _error = 'Could not launch Clerk sign-in');
     }
-    setState(() => _loading = false);
   }
 
   @override
@@ -52,43 +45,46 @@ class _LoginScreenState extends State<LoginScreen> {
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text('Bangladesh Landmarks', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 12),
-                      Text('Sign in to manage landmarks', style: theme.textTheme.bodyMedium),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _userCtl,
-                        decoration: const InputDecoration(labelText: 'Username'),
-                        validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _passCtl,
-                        obscureText: true,
-                        decoration: const InputDecoration(labelText: 'Password'),
-                        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                      ),
-                      if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red))),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: _loading ? null : _submit,
-                        icon: _loading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.lock_open),
-                        label: const Text('Sign In'),
-                      ),
-                      const SizedBox(height: 8),
-                      Text('Any non-empty credentials are accepted for this demo. A token is stored locally to protect CRUD actions.', style: theme.textTheme.bodySmall),
-                    ],
-                  ),
-                ),
-              ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('Bangladesh Landmarks', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Text('Sign in with Clerk (Google) to manage landmarks.', style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _loading ? null : _openClerkHosted,
+              icon: const Icon(Icons.login),
+              label: const Text('Sign in with Clerk (opens browser)'),
             ),
-          ),
+            const SizedBox(height: 12),
+            Text('After signing in, paste the Clerk session/JWT here. Backend must verify this token.', style: theme.textTheme.bodySmall),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _tokenCtl,
+              decoration: const InputDecoration(labelText: 'Clerk session/JWT'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: _loading
+                  ? null
+                  : () async {
+                      if (_tokenCtl.text.trim().isEmpty) return;
+                      setState(() {
+                        _loading = true;
+                        _error = null;
+                      });
+                      await AuthService().setExternalToken(_tokenCtl.text.trim());
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clerk token applied')));
+                      setState(() => _loading = false);
+                    },
+              icon: const Icon(Icons.vpn_key),
+              label: const Text('Apply Clerk Token'),
+            ),
+            if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red))),
+          ],
         ),
       ),
     );

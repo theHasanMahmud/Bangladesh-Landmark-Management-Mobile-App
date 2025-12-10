@@ -28,6 +28,8 @@ class _MapScreenState extends State<MapScreen> {
   bool _locating = false;
   MapStyle _style = MapStyle.standard;
 
+  bool _hasValidImage(Landmark e) => e.imageUrl != null && e.imageUrl!.startsWith('http');
+
   @override
   void initState() {
     super.initState();
@@ -136,7 +138,7 @@ class _MapScreenState extends State<MapScreen> {
                     height: 50,
                     builder: (ctx) => GestureDetector(
                       onTap: () => _showBottomSheet(e),
-                      child: e.imageUrl != null
+                      child: _hasValidImage(e)
                           ? CircleAvatar(backgroundImage: NetworkImage(e.imageUrl!), radius: 20)
                           : const Icon(Icons.location_on, size: 32, color: Colors.red),
                     ),
@@ -208,8 +210,21 @@ class _MapScreenState extends State<MapScreen> {
           ),
           Text(e.title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          if (e.imageUrl != null)
-            ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(e.imageUrl!, height: 200, width: double.infinity, fit: BoxFit.cover)),
+          if (_hasValidImage(e))
+            ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  e.imageUrl!,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 200,
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image),
+                  ),
+                )),
           const SizedBox(height: 8),
           Row(children: [
             Expanded(child: Text('Lat: ${e.lat.toStringAsFixed(5)}', style: Theme.of(context).textTheme.bodyMedium)),
