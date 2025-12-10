@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../config/clerk_config.dart';
 import '../services/auth_service.dart';
-import 'clerk_webview_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,27 +10,33 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _tokenCtl = TextEditingController();
-  late final TextEditingController _urlCtl;
+  final _userCtl = TextEditingController();
+  final _passCtl = TextEditingController();
   bool _loading = false;
+  bool _isSignUp = false;
   String? _error;
 
   @override
   void dispose() {
-    _tokenCtl.dispose();
-    _urlCtl.dispose();
+    _userCtl.dispose();
+    _passCtl.dispose();
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _urlCtl = TextEditingController(text: ClerkConfig.defaultSignInUrl);
-  }
-
-  Future<void> _openClerkHosted() async {
-    // Prefer in-app webview to capture callback token.
-    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ClerkWebViewScreen()));
+  Future<void> _submit() async {
+    if (_userCtl.text.trim().isEmpty || _passCtl.text.isEmpty) {
+      setState(() => _error = 'Username and password required');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    // Mock auth: generate a token from credentials.
+    await AuthService().setExternalToken('${_userCtl.text.trim()}-${_passCtl.text}');
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_isSignUp ? 'Account created' : 'Signed in')));
+    setState(() => _loading = false);
   }
 
   @override
@@ -50,30 +52,42 @@ class _LoginScreenState extends State<LoginScreen> {
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                 child: Column(
-                   mainAxisSize: MainAxisSize.min,
-                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                   children: [
-                     Text('Bangladesh Landmarks', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-                     const SizedBox(height: 12),
-                     Text('Sign in with Google (Clerk) to manage landmarks.', style: theme.textTheme.bodyMedium),
-                     const SizedBox(height: 20),
-                     ElevatedButton.icon(
-                       onPressed: _loading ? null : _openClerkHosted,
-                       icon: const Icon(Icons.login),
-                       label: const Text('Sign in with Google'),
-                     ),
-                     const SizedBox(height: 8),
-                     const SizedBox(height: 12),
-                     Text('This button opens an in-app sign-in page. Configure Clerk to redirect to com.example.vangti_chai://clerk-callback?token=YOUR_JWT so the app can capture your session automatically.', style: theme.textTheme.bodySmall),
-                     if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red))),
-                   ],
-                 ),
-               ),
-             ),
-           ),
-         ),
-       ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Bangladesh Landmarks', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    Text(_isSignUp ? 'Create an account to manage landmarks.' : 'Sign in to manage landmarks.', style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _userCtl,
+                      decoration: const InputDecoration(labelText: 'Username'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _passCtl,
+                      obscureText: true,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                    ),
+                    if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red))),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: _loading ? null : _submit,
+                      icon: _loading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.login),
+                      label: Text(_isSignUp ? 'Sign up' : 'Sign in'),
+                    ),
+                    TextButton(
+                      onPressed: _loading ? null : () => setState(() => _isSignUp = !_isSignUp),
+                      child: Text(_isSignUp ? 'Have an account? Sign in' : 'Need an account? Sign up'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

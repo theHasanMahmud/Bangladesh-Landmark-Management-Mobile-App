@@ -23,8 +23,6 @@ dependencies:
   flutter_map_marker_cluster: ^1.0.0
   geolocator: ^10.1.0
   shared_preferences: ^2.2.2
-  url_launcher: ^6.2.5
-  webview_flutter: ^4.7.0
 
 dev_dependencies:
   flutter_test:
