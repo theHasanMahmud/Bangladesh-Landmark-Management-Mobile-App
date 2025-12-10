@@ -67,12 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
                    children: [
                      Text('Bangladesh Landmarks', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                      const SizedBox(height: 12),
-                     Text('Sign in with Clerk (Google) to manage landmarks.', style: theme.textTheme.bodyMedium),
+                     Text('Sign in with Google (Clerk) to manage landmarks.', style: theme.textTheme.bodyMedium),
                      const SizedBox(height: 20),
                      ElevatedButton.icon(
                        onPressed: _loading ? null : _openClerkHosted,
                        icon: const Icon(Icons.login),
-                       label: const Text('Sign in with Clerk (opens browser)'),
+                       label: const Text('Sign in with Google'),
                      ),
                      const SizedBox(height: 8),
                      TextField(
