@@ -1,4 +1,4 @@
-# Bangladesh Landmarks – REST-backed CRUD app
+# Bangladesh Landmarks Management Mobile App
 
 Flutter app for CSE489 that manages Bangladesh landmarks against the provided API (`https://labs.anontech.info/cse489/t3/api.php`). Auth is powered by Clerk, UI is Cupertino-styled, and data is cached offline with SQLite.
 
@@ -9,7 +9,17 @@ Flutter app for CSE489 that manages Bangladesh landmarks against the provided AP
 ---
 
 ## Preview
-Map overview, records list with swipe actions, and a form for add/edit. (Screenshots/GIFs can be dropped here.)
+<img width="1470" height="956" alt="image" src="https://github.com/user-attachments/assets/e284a3d4-23eb-4910-8eda-a9ed5753fe87" />
+
+
+---
+
+## App Screenshots
+<img width="1920" height="1080" alt="photo-collage png" src="https://github.com/user-attachments/assets/4907a904-4be5-4446-bee3-d0362bc13b6b" />
+
+<img width="1440" height="1080" alt="photo-collage png (1)" src="https://github.com/user-attachments/assets/a0a9e171-8d4b-4462-abdb-ff663d0a6826" />
+
+<img width="1920" height="1080" alt="photo-collage png (2)" src="https://github.com/user-attachments/assets/fc3dd9b8-b0dc-4243-ae31-1593d08290d5" />
 
 ---
 
