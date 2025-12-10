@@ -24,10 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _openClerkHosted() async {
-    final uri = Uri.https('accounts.clerk.com', '/v2/sign-in', {
-      'redirect_url': 'https://dashboard.clerk.com',
-      'publishable_key': ClerkConfig.publishableKey,
-    });
+    final uri = Uri.parse('${ClerkConfig.frontendApiUrl}/sign-in');
     try {
       final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!launched && mounted) {
