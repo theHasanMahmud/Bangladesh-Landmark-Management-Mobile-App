@@ -14,17 +14,25 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _tokenCtl = TextEditingController();
+  late final TextEditingController _urlCtl;
   bool _loading = false;
   String? _error;
 
   @override
   void dispose() {
     _tokenCtl.dispose();
+    _urlCtl.dispose();
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _urlCtl = TextEditingController(text: ClerkConfig.defaultSignInUrl);
+  }
+
   Future<void> _openClerkHosted() async {
-    final uri = Uri.parse('${ClerkConfig.frontendApiUrl}/sign-in');
+    final uri = Uri.parse(_urlCtl.text.trim());
     try {
       final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!launched && mounted) {
@@ -65,6 +73,19 @@ class _LoginScreenState extends State<LoginScreen> {
                        onPressed: _loading ? null : _openClerkHosted,
                        icon: const Icon(Icons.login),
                        label: const Text('Sign in with Clerk (opens browser)'),
+                     ),
+                     const SizedBox(height: 8),
+                     TextField(
+                       controller: _urlCtl,
+                       decoration: const InputDecoration(labelText: 'Clerk sign-in URL'),
+                     ),
+                     TextButton(
+                       onPressed: () async {
+                         await Clipboard.setData(ClipboardData(text: _urlCtl.text.trim()));
+                         if (!mounted) return;
+                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign-in URL copied')));
+                       },
+                       child: const Text('Copy sign-in URL'),
                      ),
                      const SizedBox(height: 12),
                      Text('After signing in, paste the Clerk session/JWT here. Backend must verify this token.', style: theme.textTheme.bodySmall),
