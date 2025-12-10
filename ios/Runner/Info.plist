@@ -47,5 +47,14 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app uses your location to prefill coordinates for new landmarks.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.example.vangti_chai</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

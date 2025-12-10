@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../config/clerk_config.dart';
 import '../services/auth_service.dart';
+import 'clerk_webview_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,20 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _openClerkHosted() async {
-    final uri = Uri.parse(_urlCtl.text.trim());
-    try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!launched && mounted) {
-        setState(() => _error = 'Could not launch Clerk sign-in. Copying URL to clipboard.');
-        await Clipboard.setData(ClipboardData(text: uri.toString()));
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clerk sign-in URL copied. Open in browser.')));
-      }
-    } catch (_) {
-      if (!mounted) return;
-      await Clipboard.setData(ClipboardData(text: uri.toString()));
-      setState(() => _error = 'Could not launch Clerk sign-in. URL copied to clipboard.');
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clerk sign-in URL copied. Open in browser.')));
-    }
+    // Prefer in-app webview to capture callback token.
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ClerkWebViewScreen()));
   }
 
   @override
@@ -75,43 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
                        label: const Text('Sign in with Google'),
                      ),
                      const SizedBox(height: 8),
-                     TextField(
-                       controller: _urlCtl,
-                       decoration: const InputDecoration(labelText: 'Clerk sign-in URL'),
-                     ),
-                     TextButton(
-                       onPressed: () async {
-                         await Clipboard.setData(ClipboardData(text: _urlCtl.text.trim()));
-                         if (!mounted) return;
-                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign-in URL copied')));
-                       },
-                       child: const Text('Copy sign-in URL'),
-                     ),
                      const SizedBox(height: 12),
-                     Text('After signing in, paste the Clerk session/JWT here. Backend must verify this token.', style: theme.textTheme.bodySmall),
-                     const SizedBox(height: 8),
-                     TextField(
-                       controller: _tokenCtl,
-                       decoration: const InputDecoration(labelText: 'Clerk session/JWT'),
-                     ),
-                     const SizedBox(height: 8),
-                     ElevatedButton.icon(
-                       onPressed: _loading
-                           ? null
-                           : () async {
-                               if (_tokenCtl.text.trim().isEmpty) return;
-                               setState(() {
-                                 _loading = true;
-                                 _error = null;
-                               });
-                               await AuthService().setExternalToken(_tokenCtl.text.trim());
-                               if (!mounted) return;
-                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clerk token applied')));
-                               setState(() => _loading = false);
-                             },
-                       icon: const Icon(Icons.vpn_key),
-                       label: const Text('Apply Clerk Token'),
-                     ),
+                     Text('This button opens an in-app sign-in page. Configure Clerk to redirect to com.example.vangti_chai://clerk-callback?token=YOUR_JWT so the app can capture your session automatically.', style: theme.textTheme.bodySmall),
                      if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red))),
                    ],
                  ),
