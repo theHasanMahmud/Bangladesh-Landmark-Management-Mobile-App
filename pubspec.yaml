@@ -9,11 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.19.0
-  http: ^0.13.6
+  intl: ^0.20.2
+  http: ^1.1.0
   flutter_map: ^4.0.0
   latlong2: ^0.8.1
-  image_picker: ^0.8.7+4
+  image_picker: ^1.0.7
   image: ^4.0.17
   path_provider: ^2.0.11
   sqflite: ^2.2.8+1
@@ -23,11 +23,14 @@ dependencies:
   flutter_map_marker_cluster: ^1.0.0
   geolocator: ^10.1.0
   shared_preferences: ^2.2.2
+  clerk_flutter: ^0.0.13-beta
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
 
+dependency_overrides:
+  http: ^1.1.0
 flutter:
   uses-material-design: true
