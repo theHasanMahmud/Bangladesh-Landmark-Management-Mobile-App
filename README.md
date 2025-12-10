@@ -155,6 +155,17 @@ Manual checks: login flow, add/edit/delete, map markers + bottom sheet actions, 
 
 ---
 
+
+## Known Limitations
+
+Image uploads are limited because of API issue.
+No file/image validation beyond resize; large files or unsupported formats may still cause API errors.
+Auth is Clerk-only; if Clerk is unreachable, CRUD is blocked (no offline auth or guest mode).
+Offline is read-only: cached landmarks show when offline, but create/update/delete is disabled until network returns.
+API error handling is basic; detailed server-side validation messages aren’t surfaced beyond generic dialogs/snackbars.
+
+---
+
 ## Contact
 
 Questions or feedback? Reach out at `hasanmahmudmajumder@gmail.com`. If this helped, star the repo.။
