@@ -30,6 +30,7 @@ class _ListScreenState extends State<ListScreen> {
     setState(() => _loading = true);
     try {
       final list = await _api.fetchAll();
+      list.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
       if (_db.supported) {
         await _db.upsertLandmarks(list);
       }
@@ -37,6 +38,7 @@ class _ListScreenState extends State<ListScreen> {
     } catch (_) {
       if (_db.supported) {
         final cached = await _db.getAll();
+        cached.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
         setState(() => _items = cached);
       }
     } finally {

@@ -4,6 +4,8 @@ build/
 flutter/
 pubspec.lock
 .packages
+.flutter-plugins
+.flutter-plugins-dependencies
 
 # macOS
 .DS_Store
