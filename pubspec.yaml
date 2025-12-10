@@ -1,5 +1,5 @@
-name: vangti_chai
-description: A responsive change calculator with a custom numeric keypad for the CSE 489 assignment.
+name: bangladesh_landmarks
+description: Bangladesh Landmarks management app for CSE 489 assignment.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
   http: ^1.1.0

@@ -6,7 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vangti_chai/main.dart';
+import 'package:bangladesh_landmarks/main.dart';
 
 void main() {
   testWidgets('App renders login screen', (tester) async {

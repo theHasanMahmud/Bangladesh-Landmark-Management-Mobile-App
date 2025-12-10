@@ -82,9 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
 						icon: const Icon(Icons.logout),
 						tooltip: 'Sign out',
 						onPressed: () async {
+							await ClerkAuth.of(context).signOut();
 							await AuthService().logout();
-							if (!mounted) return;
-							ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Signed out')));
+							if (mounted) {
+								ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Signed out')));
+							}
 						},
 					),
 				],
